@@ -39,6 +39,20 @@ def split_number(number):
     split_number = re.search(r'([0-9]{1,3})[\- ]([0-9]{1,3})[\- ]([0-9]{4,10})', number)
     return split_number.group(1), split_number.group(2), split_number.group(3)
 
+# tests if an ip address meets IPv4 standards, IPv6 standards, or neither
+def ip_validation(string):
+    # - format of an IPv4 address is A.B.C.D where A, B, C and D are integers lying between 0 and 255
+    # - the 128 bits of an IPv6 address are represented in 8 groups of 16 bits each
+    # - each group is written as 4 hexadecimal digits and the groups are separated by colons (:)
+    IPv4_range = r'([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])'
+    IPv6_range = r'([0-9a-fA-F]{1,4})'
+    if re.search(r'^{0}\.{0}\.{0}\.{0}$'.format(IPv4_range), string):
+        return 'IPv4'
+    elif re.search(r'^{0}:{0}:{0}:{0}:{0}:{0}:{0}:{0}$'.format(IPv6_range), string):
+        return 'IPv6'
+    else:
+        return None
+
 
 # test methods for regex functions
 class TestRegexFun(unittest.TestCase):
@@ -71,6 +85,14 @@ class TestRegexFun(unittest.TestCase):
         self.assertEquals(split_number('91-011-23413627'), ('91', '011', '23413627'))
         self.assertEquals(split_number('1 877 2638277'), ('1', '877', '2638277'))
         self.assertEquals(split_number('891-454-9195497623'), ('891', '454', '9195497623'))
+
+    def test_ip_validation(self):
+        self.assertEquals(ip_validation('This line has junk text.'), None)
+        self.assertEquals(ip_validation('35'), None)
+        self.assertEquals(ip_validation('1051:1000:4000:abcd:5:600:300c:326b'), 'IPv6')
+        self.assertEquals(ip_validation('1050:1000:2000:ab00:5:600:300c:326a'), 'IPv6')
+        self.assertEquals(ip_validation('22.231.113.164'), 'IPv4')
+        self.assertEquals(ip_validation('222.231.113.64'), 'IPv4')
 
 
 if __name__ == '__main__':
