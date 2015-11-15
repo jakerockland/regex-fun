@@ -12,9 +12,14 @@ def contains_hello(string):
 def extract_emails(string):
     return re.findall(r'[\w.-]+@[\w.-]+', string)
 
-# returns number of times the word occurs in the input string
-def count_word(word, string):
-    return  len(re.findall(r'\b{}\b'.format(word), string))
+# finds number of occurences of a substring in the given text
+def count_substring(substring, text):
+    # - substring must be preceded and succeeded by letters or numerics or an underscore
+    return len(re.findall(r'\B{}\B'.format(substring), text))
+
+# returns number of times the word occurs in the input text
+def count_word(word, text):
+    return  len(re.findall(r'\b{}\b'.format(word), text))
 
 # returns true if input username is valid, false otherwise
 def check_username(username):
@@ -34,11 +39,6 @@ def split_number(number):
     split_number = re.search(r'([0-9]{1,3})[\- ]([0-9]{1,3})[\- ]([0-9]{4,10})', number)
     return split_number.group(1), split_number.group(2), split_number.group(3)
 
-# finds number of occurences of a substring in the given text
-def num_substrings(text, substring):
-    # - substring must be preceded and succeeded by letters or numerics or an underscore
-    return len(re.findall(r'\B{}\B'.format(substring), text))
-
 
 # test methods for regex functions
 class TestRegexFun(unittest.TestCase):
@@ -56,6 +56,12 @@ class TestRegexFun(unittest.TestCase):
         self.assertEquals(count_word("foo", "foo bar (foo) bar foo-bar foo_bar foo'bar bar-foo bar, foo."), 6)
         self.assertEquals(count_word("bar", "foo bar (foo) bar foo-bar foo_bar foo'bar bar-foo bar, foo."), 6)
 
+    def test_count_substring(self):
+        self.assertEquals(count_substring('is', 'existing pessimist optimist this is'), 3)
+        self.assertEquals(count_substring('ti', 'existing pessimist optimist this is'), 2)
+        self.assertEquals(count_substring('st', 'existing pessimist optimist this is'), 1)
+        self.assertEquals(count_substring('ex', 'existing pessimist optimist this is'), 0)
+
     def test_check_username(self):
         self.assertTrue(check_username('_0898989811abced_'))
         self.assertFalse(check_username('_abce'))
@@ -65,12 +71,6 @@ class TestRegexFun(unittest.TestCase):
         self.assertEquals(split_number('91-011-23413627'), ('91', '011', '23413627'))
         self.assertEquals(split_number('1 877 2638277'), ('1', '877', '2638277'))
         self.assertEquals(split_number('891-454-9195497623'), ('891', '454', '9195497623'))
-
-    def test_num_substrings(self):
-        self.assertEquals(num_substrings('existing pessimist optimist this is', 'is'), 3)
-        self.assertEquals(num_substrings('existing pessimist optimist this is', 'ti'), 2)
-        self.assertEquals(num_substrings('existing pessimist optimist this is', 'st'), 1)
-        self.assertEquals(num_substrings('existing pessimist optimist this is', 'ex'), 0)
 
 
 if __name__ == '__main__':
